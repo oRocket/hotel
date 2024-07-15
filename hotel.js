@@ -11,7 +11,7 @@ app.use(express.static('public'));
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'password', // Replace with your MariaDB password
+    password: 'password',
     database: 'hotel_db',
     port: 3306
 });
@@ -43,7 +43,7 @@ connection.connect((err) => {
         console.log('Bookings table created successfully');
     });
 
-    // Create rooms table
+    // Create rooms table and insert sample data
     connection.query(`
         CREATE TABLE IF NOT EXISTS rooms (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,37 +59,98 @@ connection.connect((err) => {
             return;
         }
         console.log('Rooms table created successfully');
+
+        // Insert sample data into rooms table
+        connection.query(`
+            INSERT INTO rooms (room_number, type, price, capacity, description) VALUES
+            ('101', 'Single Room', 100.00, 1, 'A cozy single room'),
+            ('102', 'Double Room', 150.00, 2, 'A comfortable double room'),
+            ('103', 'Family Room', 200.00, 4, 'A spacious family room')
+        `, (err, results, fields) => {
+            if (err) {
+                console.error('Error inserting sample data into rooms table:', err);
+                return;
+            }
+            console.log('Sample data inserted into rooms table successfully');
+        });
     });
 
-    // Optionally close the connection after creating tables
-    // connection.end();
 });
 
 // Route to handle form submission
 app.post('/book', (req, res) => {
     const { name, email, phone_number, check_in_date, check_out_date, guests, room_type } = req.body;
 
-    // Debugging log to check received form data
     console.log(req.body);
 
     if (!name || !email || !phone_number || !check_in_date || !check_out_date || !guests || !room_type) {
         return res.status(400).send('All fields are required.');
     }
 
-    connection.query(
-        'INSERT INTO bookings (full_name, email, phone_number, check_in_date, check_out_date, guests, room_type) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [name, email, phone_number, check_in_date, check_out_date, guests, room_type],
-        (err, results, fields) => {
-            if (err) {
-                console.error('Error inserting booking:', err);
-                if (err.code === 'ER_DATA_TOO_LONG') {
-                    return res.status(400).send('One or more fields contain too many characters.');
-                }
-                return res.status(500).send('Error booking your room. Please try again later.');
-            }
-            res.send('Booking successful!');
+    // Start transaction
+    connection.beginTransaction(err => {
+        if (err) {
+            console.error('Error starting transaction:', err);
+            return res.status(500).send('Error booking your room. Please try again later.');
         }
-    );
+
+        // Insert booking
+        connection.query(
+            'INSERT INTO bookings (full_name, email, phone_number, check_in_date, check_out_date, guests, room_type) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [name, email, phone_number, check_in_date, check_out_date, guests, room_type],
+            (err, results, fields) => {
+                if (err) {
+                    console.error('Error inserting booking:', err);
+                    return connection.rollback(() => {
+                        res.status(500).send('Error booking your room. Please try again later.');
+                    });
+                }
+
+                console.log('Booking inserted:', results.insertId);
+
+                // Log the room_type being queried
+                console.log('Querying room type:', room_type);
+
+                // Get the room details based on the room_type
+                connection.query(
+                    'SELECT room_number, type, price, capacity, description FROM rooms WHERE type = ? LIMIT 1',
+                    [room_type],
+                    (err, roomResults, fields) => {
+                        if (err) {
+                            console.error('Error fetching room details:', err);
+                            return connection.rollback(() => {
+                                res.status(500).send('Error booking your room. Please try again later.');
+                            });
+                        }
+
+                        if (roomResults.length === 0) {
+                            return connection.rollback(() => {
+                                res.status(404).send('No rooms available of the selected type.');
+                            });
+                        }
+
+                        console.log('Room details:', roomResults[0]);
+
+                        // Commit transaction
+                        connection.commit(err => {
+                            if (err) {
+                                console.error('Error committing transaction:', err);
+                                return connection.rollback(() => {
+                                    res.status(500).send('Error booking your room. Please try again later.');
+                                });
+                            }
+
+                            // Send booking confirmation with room details
+                            res.json({
+                                message: 'Booking successful!',
+                                room: roomResults[0]
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
 });
 
 const PORT = process.env.PORT || 3000;

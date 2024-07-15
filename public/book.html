@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/css/book.css">
     <link rel="icon" href="/images/icon.png">
 </head>
-
 <body>
     <!-- NAVIGATION BAR -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -44,7 +43,7 @@
         <div class="row">
             <div class="col-sm-8">
                 <h1>Book Your Hotel</h1>
-                <form class="form-horizontal" action="/book" method="post">
+                <form class="form-horizontal" id="bookingForm" action="/book" method="post">
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="name">Full Name:</label>
                         <div class="col-sm-10">
@@ -103,6 +102,18 @@
                         </div>
                     </div>
                 </form>
+                <div id="bookingSuccess" class="alert alert-success" style="display:none;">
+                    <h2>Booking Confirmed!</h2>
+                    <p><strong>Room Number:</strong> <span id="roomNumber"></span></p>
+                    <p><strong>Room Type:</strong> <span id="roomType"></span></p>
+                    <p><strong>Price:</strong> <span id="roomPrice"></span></p>
+                    <p><strong>Capacity:</strong> <span id="roomCapacity"></span></p>
+                    <p><strong>Description:</strong> <span id="roomDescription"></span></p>
+                </div>
+                <div id="bookingError" class="alert alert-danger" style="display:none;">
+                    <h2>Booking Failed!</h2>
+                    <p id="errorMessage"></p>
+                </div>
             </div>
             <div class="col-sm-4">
                 <h1>Rooms</h1>
@@ -218,9 +229,58 @@
         </div>
     </footer>
 
-    <!-- Optional: jQuery and Bootstrap JS -->
+    <!-- Include jQuery and Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Booking Form Submission Script -->
+    <script>
+        $(document).ready(function() {
+            $('#bookingForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent the form from submitting normally
+
+                // Gather form data
+                const formData = {
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    phone_number: $('#phone_number').val(),
+                    check_in_date: $('#check_in_date').val(),
+                    check_out_date: $('#check_out_date').val(),
+                    guests: $('#guests').val(),
+                    room_type: $('#room_type').val()
+                };
+
+                // Send the form data to the server via AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/book',
+                    data: formData,
+                    success: function(response) {
+                        // On success, show the booking success message and room details
+                        $('#bookingSuccess').show();
+                        $('#bookingError').hide();
+
+                        // Update the booking details in the success message
+                        $('#roomNumber').text(response.room.room_number);
+                        $('#roomType').text(response.room.type);
+                        $('#roomPrice').text(response.room.price);
+                        $('#roomCapacity').text(response.room.capacity);
+                        $('#roomDescription').text(response.room.description);
+
+                        // Optionally, clear the form fields
+                        $('#bookingForm')[0].reset();
+                    },
+                    error: function(xhr) {
+                        // On error, show the booking error message
+                        $('#bookingSuccess').hide();
+                        $('#bookingError').show();
+
+                        // Update the error message
+                        $('#errorMessage').text(xhr.responseText || 'An error occurred while booking your room. Please try again later.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-
