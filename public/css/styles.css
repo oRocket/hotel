@@ -1,0 +1,142 @@
+        .navbar {
+            font-family: "Poppins", sans-serif;
+            font-weight: bolder;
+        }
+
+        .btn {
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
+        }
+        
+        .carousel,
+        .carousel-inner,
+        .carousel-inner .item,
+        .carousel-inner .item img {
+            height: 100vh; /* Full height */
+            width: 100vw; /* Full width */
+            object-fit: cover; /* Ensure the image covers the container */
+        }
+
+        #hero-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5); /* Add a background for better readability */
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        #hero-overlay h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        #hero-overlay p {
+            font-size: 1.5rem;
+        }
+
+        .col-sm-5 p {
+            font-family: "Poppins", sans-serif;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-family: "Poppins", sans-serif;
+            font-weight: bolder;
+        }
+
+        h2 {
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+        }
+
+        .poppins-semibold {
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .caption-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.8); /* Slight background to ensure text is readable */
+            padding: 5px;
+        }
+        .caption, .price {
+            margin: 0;
+        }
+        .price {
+            font-weight: bold;
+        }
+        .thumbnail {
+            overflow: hidden;
+            position: relative;
+        }
+        .thumbnail img {
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .thumbnail:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Add space at the top of the container */
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .container p {
+            font-size: 1.7rem;
+        }
+
+        .container h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .room-options {
+            max-height: 200px; /* Adjust height as needed */
+            overflow-y: auto;
+        }
+
+        /* Custom styles for footer */
+        .custom-footer {
+            background-color: #343a40; /* Dark background color */
+            color: #fff; /* White text color */
+            padding: 20px 0; /* Adjust padding as needed */
+        }
+
+        .custom-footer a {
+            color: #fff; /* White link color */
+        }
+
+        .footer-container {
+            max-width: 1140px; /* or any other width you want */
+            margin: 0 auto; /* center the container */
+            padding: 0 15px; /* padding for responsiveness */
+        }
+
+        .custom-footer h2 {
+            text-decoration: underline;
+            text-decoration-color: rgb(255, 145, 0);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #hero-overlay h1 {
+                font-size: 2rem;
+            }
+            #hero-overlay p {
+                font-size: 1rem;
+            }
+        }

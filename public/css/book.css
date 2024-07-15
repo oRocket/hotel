@@ -1,0 +1,81 @@
+.navbar {
+    font-family: "Poppins", sans-serif;
+    font-weight: bolder;
+}
+
+.carousel,
+.carousel-inner,
+.carousel-inner .item,
+.carousel-inner .item img {
+    height: 25vw;
+    width: 30vw;
+    object-fit: cover;
+}
+
+h1 {
+    font-family: "Poppins", sans-serif;
+    font-weight: bolder;
+}
+
+h2 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+}
+
+.poppins-semibold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+
+/* Add space at the top of the container */
+.container {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.container p {
+    font-size: 1.7rem;
+}
+
+.container h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.room-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Custom styles for footer */
+.custom-footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px 0;
+}
+
+.custom-footer a {
+    color: #fff;
+}
+
+.footer-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.custom-footer h2 {
+    text-decoration: underline;
+    text-decoration-color: rgb(255, 145, 0);
+}
+
+/* Responsive adjustments
+@media (max-width: 768px) {
+    col-md-4 {
+        width: 100%;
+        height: auto;
+    }
+}
