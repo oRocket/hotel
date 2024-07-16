@@ -81,6 +81,7 @@ Endpoint to handle booking form submissions.
 Example request:
 ```sh
 curl -X POST -d "name=John Doe&email=johndoe@example.com&phone_number=1234567890&check_in_date=2024-07-20&check_out_date=2024-07-22&guests=2&room_type=Double Room" http://localhost:3000/book
+```
 
 ## Database Schema
 ### Bookings Table
