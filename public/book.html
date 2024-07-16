@@ -104,12 +104,17 @@
                 </form>
                 <div id="bookingSuccess" class="alert alert-success" style="display:none;">
                     <h2>Booking Confirmed!</h2>
+                    <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+                    <p><strong>Email:</strong> <span id="emailAddress"></span></p>
+                    <p><strong>Unique Code:</strong> <span id="uniqueCode"></span></p>
                     <p><strong>Room Number:</strong> <span id="roomNumber"></span></p>
                     <p><strong>Room Type:</strong> <span id="roomType"></span></p>
                     <p><strong>Price:</strong> <span id="roomPrice"></span></p>
                     <p><strong>Capacity:</strong> <span id="roomCapacity"></span></p>
                     <p><strong>Description:</strong> <span id="roomDescription"></span></p>
-                </div>
+                    <!-- Print/Save button -->
+                    <button type="button" class="btn btn-primary" onclick="printBookingConfirmation()">Print/Save Confirmation</button>
+                </div>               
                 <div id="bookingError" class="alert alert-danger" style="display:none;">
                     <h2>Booking Failed!</h2>
                     <p id="errorMessage"></p>
@@ -236,51 +241,69 @@
     <!-- Booking Form Submission Script -->
     <script>
         $(document).ready(function() {
-            $('#bookingForm').on('submit', function(event) {
-                event.preventDefault(); // Prevent the form from submitting normally
+        $('#bookingForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
 
-                // Gather form data
-                const formData = {
-                    name: $('#name').val(),
-                    email: $('#email').val(),
-                    phone_number: $('#phone_number').val(),
-                    check_in_date: $('#check_in_date').val(),
-                    check_out_date: $('#check_out_date').val(),
-                    guests: $('#guests').val(),
-                    room_type: $('#room_type').val()
-                };
+            // Gather form data
+            const formData = {
+                name: $('#name').val(),
+                email: $('#email').val(),
+                phone_number: $('#phone_number').val(),
+                check_in_date: $('#check_in_date').val(),
+                check_out_date: $('#check_out_date').val(),
+                guests: $('#guests').val(),
+                room_type: $('#room_type').val()
+            };
 
-                // Send the form data to the server via AJAX
-                $.ajax({
-                    type: 'POST',
-                    url: '/book',
-                    data: formData,
-                    success: function(response) {
-                        // On success, show the booking success message and room details
-                        $('#bookingSuccess').show();
-                        $('#bookingError').hide();
+            // Send the form data to the server via AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/book',
+                data: formData,
+                success: function(response) {
+                    // On success, show the booking success message and room details
+                    $('#bookingSuccess').show();
+                    $('#bookingError').hide();
 
-                        // Update the booking details in the success message
-                        $('#roomNumber').text(response.room.room_number);
-                        $('#roomType').text(response.room.type);
-                        $('#roomPrice').text(response.room.price);
-                        $('#roomCapacity').text(response.room.capacity);
-                        $('#roomDescription').text(response.room.description);
+                    // Update the booking details in the success message
+                    $('#roomNumber').text(response.room.room_number);
+                    $('#roomType').text(response.room.type);
+                    $('#roomPrice').text(response.room.price);
+                    $('#roomCapacity').text(response.room.capacity);
+                    $('#roomDescription').text(response.room.description);
+                    
+                    // Additional details
+                    $('#fullName').text(response.full_name);
+                    $('#emailAddress').text(response.email);
+                    $('#uniqueCode').text(response.uniqueCode);
 
-                        // Optionally, clear the form fields
-                        $('#bookingForm')[0].reset();
-                    },
-                    error: function(xhr) {
-                        // On error, show the booking error message
-                        $('#bookingSuccess').hide();
-                        $('#bookingError').show();
+                    // Optionally, clear the form fields
+                    $('#bookingForm')[0].reset();
+                },
+                error: function(xhr) {
+                    // On error, show the booking error message
+                    $('#bookingSuccess').hide();
+                    $('#bookingError').show();
 
-                        // Update the error message
-                        $('#errorMessage').text(xhr.responseText || 'An error occurred while booking your room. Please try again later.');
-                    }
-                });
+                    // Update the error message
+                    $('#errorMessage').text(xhr.responseText || 'An error occurred while booking your room. Please try again later.');
+                }
             });
         });
+    });
+    // Function to print/save booking confirmation
+    function printBookingConfirmation() {
+        var printContents = document.getElementById('bookingSuccess').innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+
     </script>
+    
 </body>
 </html>

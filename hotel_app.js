@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
+const crypto = require('crypto');
 const app = express();
 
 // Middleware setup
@@ -23,7 +24,7 @@ connection.connect((err) => {
     }
     console.log('Connected to MariaDB as id', connection.threadId);
 
-    // Create bookings table
+    // Create bookings table if not exists
     connection.query(`
         CREATE TABLE IF NOT EXISTS bookings (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -33,7 +34,8 @@ connection.connect((err) => {
             check_in_date DATE NOT NULL,
             check_out_date DATE NOT NULL,
             guests INT NOT NULL,
-            room_type VARCHAR(50) NOT NULL
+            room_type VARCHAR(50) NOT NULL,
+            unique_code VARCHAR(100) NOT NULL
         )
     `, (err, results, fields) => {
         if (err) {
@@ -41,6 +43,34 @@ connection.connect((err) => {
             return;
         }
         console.log('Bookings table created successfully');
+
+        // Check if unique_code column exists
+        connection.query(`
+            SELECT * FROM information_schema.columns 
+            WHERE table_schema = 'hotel_db' 
+            AND table_name = 'bookings' 
+            AND column_name = 'unique_code'
+        `, (err, results, fields) => {
+            if (err) {
+                console.error('Error checking column:', err);
+                return;
+            }
+
+            if (results.length === 0) {
+                // Column does not exist, alter table to add unique_code column
+                connection.query(`
+                    ALTER TABLE bookings ADD COLUMN unique_code VARCHAR(100) NOT NULL
+                `, (err, results, fields) => {
+                    if (err) {
+                        console.error('Error adding unique_code column:', err);
+                        return;
+                    }
+                    console.log('unique_code column added successfully');
+                });
+            } else {
+                console.log('unique_code column already exists');
+            }
+        });
     });
 
     // Create rooms table and insert sample data
@@ -77,6 +107,11 @@ connection.connect((err) => {
 
 });
 
+// Function to generate a unique code
+function generateUniqueCode() {
+    return crypto.randomBytes(16).toString('hex');
+}
+
 // Route to handle form submission
 app.post('/book', (req, res) => {
     const { name, email, phone_number, check_in_date, check_out_date, guests, room_type } = req.body;
@@ -87,6 +122,8 @@ app.post('/book', (req, res) => {
         return res.status(400).send('All fields are required.');
     }
 
+    const uniqueCode = generateUniqueCode();
+
     // Start transaction
     connection.beginTransaction(err => {
         if (err) {
@@ -96,8 +133,8 @@ app.post('/book', (req, res) => {
 
         // Insert booking
         connection.query(
-            'INSERT INTO bookings (full_name, email, phone_number, check_in_date, check_out_date, guests, room_type) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [name, email, phone_number, check_in_date, check_out_date, guests, room_type],
+            'INSERT INTO bookings (full_name, email, phone_number, check_in_date, check_out_date, guests, room_type, unique_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [name, email, phone_number, check_in_date, check_out_date, guests, room_type, uniqueCode],
             (err, results, fields) => {
                 if (err) {
                     console.error('Error inserting booking:', err);
@@ -140,9 +177,12 @@ app.post('/book', (req, res) => {
                                 });
                             }
 
-                            // Send booking confirmation with room details
+                            // Send booking confirmation with room details and unique code
                             res.json({
                                 message: 'Booking successful!',
+                                uniqueCode: uniqueCode,
+                                full_name: name,
+                                email: email,
                                 room: roomResults[0]
                             });
                         });
