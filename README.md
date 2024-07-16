@@ -47,7 +47,7 @@ Before you begin, ensure you have the following installed on your machine:
 
 1. **Start the server:**
     ```sh
-    node app.js
+    node hotel_app.js
     ```
 
 2. **Access the application:**
