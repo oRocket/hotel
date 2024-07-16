@@ -20,7 +20,7 @@ Before you begin, ensure you have the following installed on your machine:
 
 2. **Install dependencies:**
     ```sh
-    npm install
+    npm install express body-parser mysql2
     ```
 
 3. **Set up the database:**
