@@ -14,8 +14,8 @@ Before you begin, ensure you have the following installed on your machine:
 
 1. **Clone the repository:**
     ```sh
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/oRocket/hotel.git
+    cd hotel
     ```
 
 2. **Install dependencies:**
