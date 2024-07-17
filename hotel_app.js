@@ -98,10 +98,10 @@ connection.connect((err) => {
             ('103', 'Family Room', 200.00, 4, 'A spacious family room')
         `, (err, results, fields) => {
             if (err) {
-                console.error('Error inserting sample data into rooms table:', err);
+                console.error('Error inserting data into rooms table:', err);
                 return;
             }
-            console.log('Sample data inserted into rooms table successfully');
+            console.log('Data inserted into rooms table successfully');
         });
     });
 
